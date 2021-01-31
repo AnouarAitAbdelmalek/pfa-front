@@ -3,13 +3,17 @@ import {
   Button,
   ButtonGroup,
   Card,
+  Col,
+  Container,
   FormControl,
   InputGroup,
+  Row,
   Table,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "./demandeChequier.css";
 import Axios from "axios";
+import NavigationBar from "../shared/NavigationBar";
 
 class ListDemandeChequier extends Component {
   constructor(props) {
@@ -30,7 +34,13 @@ class ListDemandeChequier extends Component {
     };
   }
 
+  path = window.location.origin;
+
+  componentWillMount() {
+    if((sessionStorage.getItem('username') === null)) window.location.reload();
+  }
   componentDidMount() {
+    
     this.getAllDemandeChequiers();
     
     this.getAllComptes();
@@ -91,7 +101,9 @@ class ListDemandeChequier extends Component {
   };
 
   getAllDemandeChequiers = () => {
-    Axios.get("http://localhost:8082/demandeChequier/abonne/1/demandeChequiers")
+    let authString = sessionStorage.getItem('basicauth');
+    Axios.get("http://localhost:8082/abonne/"+sessionStorage.getItem('id')+"/demandeChequiers",
+    {headers : {authorization : authString}})
     .then((response) => response.data)
     .then((data) => {
       this.setState({
@@ -101,7 +113,9 @@ class ListDemandeChequier extends Component {
   };
 
   getAllComptes = () => {
-    Axios.get("http://localhost:8082/demandeChequier/abonne/1/comptes")
+    let authString = sessionStorage.getItem('basicauth');
+    Axios.get("http://localhost:8082/abonne/"+sessionStorage.getItem('id')+"/comptes",
+    {headers : {authorization : authString}})
       .then((response) => response.data)
       .then((data) => {
         this.setState({
@@ -152,7 +166,12 @@ class ListDemandeChequier extends Component {
     const totalPages = Math.ceil(demandeChequiers.length / numberPerPage);
 
     return (
-      <Card className="border border-dark bg-dark text-white">
+      <div>
+        <NavigationBar />
+      <Container>
+        <Row>
+          <Col lg="12" style={{marginTop: '25px'}}>
+          <Card className="border border-dark bg-dark text-white">
         <Card.Header>Liste des demandes chéquiers</Card.Header>
         <Card.Body>
           {/* <Form id="searchFormId">
@@ -303,7 +322,7 @@ class ListDemandeChequier extends Component {
                           style={{ marginRight: "25px" }}
                         >
                           <img
-                            src="%PUBLIC_URL%/../images/see.png"
+                            src={this.path+"/images/see.png"}
                             width="20"
                             alt="See"
                           />
@@ -318,7 +337,7 @@ class ListDemandeChequier extends Component {
                             className="btn btn-danger"
                           >
                             <img
-                              src="%PUBLIC_URL%/../images/edit.png"
+                              src={this.path+"/images/edit.png"}
                               width="20"
                               alt="Edit"
                             />
@@ -326,7 +345,7 @@ class ListDemandeChequier extends Component {
                         ) : (
                           <Button disabled variant="danger">
                             <img
-                              src="%PUBLIC_URL%/../images/edit.png"
+                              src={this.path+"/images/edit.png"}
                               width="20"
                               alt="Edit"
                             />
@@ -355,7 +374,7 @@ class ListDemandeChequier extends Component {
                   onClick={this.firstPage}
                 >
                   <img
-                    src="%PUBLIC_URL%/../images/first.png"
+                    src={this.path+"/images/first.png"}
                     width="20"
                     alt="first"
                   />
@@ -367,7 +386,7 @@ class ListDemandeChequier extends Component {
                   onClick={this.prevPage}
                 >
                   <img
-                    src="%PUBLIC_URL%/../images/prev.png"
+                    src={this.path+"/images/prev.png"}
                     width="20"
                     alt="prev"
                   />
@@ -391,7 +410,7 @@ class ListDemandeChequier extends Component {
                   onClick={this.nextPage}
                 >
                   <img
-                    src="%PUBLIC_URL%/../images/next.png"
+                    src={this.path+"/images/next.png"}
                     width="20"
                     alt="next"
                   />
@@ -404,7 +423,7 @@ class ListDemandeChequier extends Component {
                   onClick={this.lastPage}
                 >
                   <img
-                    src="%PUBLIC_URL%/../images/last.png"
+                    src={this.path+"/images/last.png"}
                     width="20"
                     alt="last"
                   />
@@ -414,6 +433,11 @@ class ListDemandeChequier extends Component {
           </div>
         </Card.Footer>
       </Card>
+          </Col>
+          </Row>
+          </Container>
+          </div>
+      
     );
   }
 }

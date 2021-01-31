@@ -1,8 +1,8 @@
-import { combineReducers } from "redux";
-import demandeChequierReducer from "../demandeChequier/demandeChequierReducer";
+// import { combineReducers } from "redux";
+// import demandeChequierReducer from "../demandeChequier/demandeChequierReducer";
 
-const rootReducer = combineReducers({
-  demandeChequier: demandeChequierReducer,
-});
+// const rootReducer = combineReducers({
+//   demandeChequier: demandeChequierReducer,
+// });
 
-export default rootReducer;
+// export default rootReducer;

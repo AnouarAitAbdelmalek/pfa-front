@@ -1,5 +1,7 @@
+import Axios from "axios";
 import React, { Component } from "react";
-import { Form, Button, Jumbotron } from "react-bootstrap";
+import { Form, Button, Jumbotron, Col, Container, Row } from "react-bootstrap";
+import NavigationBar from "../shared/NavigationBar";
 
 export default class Login extends Component {
   constructor(props) {
@@ -7,37 +9,45 @@ export default class Login extends Component {
     this.state = {
       username: "",
       password: "",
+      enabled: false
     };
   }
 
-  // login = (event) => {
-  //   event.preventDefault();
+  login = (event) => {
+    event.preventDefault();
 
-  //   // const headers = new Headers();
-  //   // headers.append("Content-Type", "application/json");
-  //   const utilisateur = {
-  //     username: this.state.username,
-  //     password: this.state.password,
-  //   };
+    const utilisateur = {
+      username: this.state.username,
+      password: this.state.password,
+    }; 
 
-  //   fetch("http://localhost:8081/demandeChequier/login", {
-  //     method: "POST",
-  //     headers: {
-  //       Accept: "application/json",
-  //       "Content-type": "application/json",
-  //     },
-  //     body: JSON.stringify(utilisateur),
-  //   })
-  //     .then((response) => response.json())
-  //     .then(
-  //       (data) => {
-  //         alert(data);
-  //       },
-  //       (error) => {
-  //         alert("makhdamch had lhzaq");
-  //       }
-  //     );
-  // };
+    let authString = 'Basic ' + btoa(utilisateur.username + ":" + utilisateur.password);
+    Axios.get("http://localhost:8082/abonne/"+ utilisateur.username, {
+      headers: {authorization : authString}
+    })
+      .then(response => response.data)
+      .then(
+        (data) => {
+          console.log(data);
+          sessionStorage.setItem('username', data.username);
+          sessionStorage.setItem('nom', data.nom);
+          sessionStorage.setItem('prenom', data.prenom);
+          sessionStorage.setItem('basicauth', authString);
+          sessionStorage.setItem('id', data.id);
+
+          window.location.reload();
+          
+
+        },
+        (error) => {
+          this.setState({
+            username: "",
+            password: "",
+            enabled: true
+          });
+        }
+      );
+  };
 
   formChange = (event) => {
     this.setState({
@@ -47,11 +57,17 @@ export default class Login extends Component {
 
   render() {
     return (
+      <div>
+        <NavigationBar />
+      <Container>
+        <Row>
+          <Col lg="12" style={{marginTop: '25px'}}>
       <Jumbotron className="bg-dark text-white">
         <Form onSubmit={this.login}>
           <Form.Group>
             <Form.Label>Nom d'utilisateur (username)</Form.Label>
             <Form.Control
+            required
               type="text"
               value={this.state.username}
               onChange={this.formChange}
@@ -67,19 +83,29 @@ export default class Login extends Component {
           <Form.Group>
             <Form.Label>Mot de passe</Form.Label>
             <Form.Control
+            required
               type="password"
               value={this.state.password}
               onChange={this.formChange}
               placeholder="Saisissez votre mot de passe..."
               name="password"
             />
+            <Form.Text className="text-muted">
+              Si vous avez oublié votre mot de passe, veuillez contacter votre agent
+              bancaire.
+            </Form.Text>
           </Form.Group>
 
-          <Button href="list" variant="primary" type="submit">
+          <Button variant="primary" type="submit">
             Connexion
           </Button>
         </Form>
+        <p style={{color: 'red', textAlign: 'center'}}> {this.state.enabled === true ? "Données erronées !" : ""} </p>
       </Jumbotron>
+      </Col>
+      </Row>
+      </Container>
+      </div>
     );
   }
 }

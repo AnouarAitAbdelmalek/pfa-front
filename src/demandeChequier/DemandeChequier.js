@@ -1,6 +1,8 @@
 import Axios from "axios";
 import React, { Component } from "react";
-import { Card, Form, Button, Col } from "react-bootstrap";
+import { Card, Form, Button, Col, Container, Row } from "react-bootstrap";
+import { Route } from "react-router-dom";
+import NavigationBar from "../shared/NavigationBar";
 import ToastComponent from "../shared/ToastComponent";
 
 
@@ -32,6 +34,7 @@ class DemandeChequier extends Component {
   };
 
   componentWillMount() {
+    
     this.unlisten = this.props.history.listen((location, action) => {
       this.setState({ demandeChequier: this.initialState });
     });
@@ -43,7 +46,6 @@ class DemandeChequier extends Component {
 
   componentDidMount() {
     this.getAllComptes();
-    console.log(this.state);
 
     const demandeChequierIdEdit = +this.props.match.params.idEdit;
     if (demandeChequierIdEdit) {
@@ -59,12 +61,14 @@ class DemandeChequier extends Component {
   }
 
   getDemandeChequier(id) {
-    Axios.get("http://localhost:8082/demandeChequier/demandeChequier?id=" + id)
+    let authString = sessionStorage.getItem('basicauth');
+    
+    Axios.get("http://localhost:8082/demandeChequier?id=" + id,
+    {headers : {authorization : authString}})
     .then(response => response.data)
     .then(data => {
       if (data != null) {
         this.setState({demandeChequier: data});
-        console.log(this.state.demandeChequier);
       } else {
         alert("dalee");
       }
@@ -74,7 +78,9 @@ class DemandeChequier extends Component {
   }
 
   getAllComptes = () => {
-    Axios.get("http://localhost:8082/demandeChequier/abonne/1/comptes")
+    let authString = sessionStorage.getItem('basicauth');
+    Axios.get("http://localhost:8082/abonne/"+sessionStorage.getItem('id')+"/comptes",
+    {headers : {authorization : authString}})
       .then((response) => response.data)
       .then((data) => {
         this.setState({
@@ -103,9 +109,12 @@ class DemandeChequier extends Component {
       },
     };
 
+    let authString = sessionStorage.getItem('basicauth');
+    
     Axios.post(
-      "http://localhost:8082/demandeChequier/demandeChequier",
-      demandeChequier
+      "http://localhost:8082/demandeChequier",
+      demandeChequier,
+      {headers : {authorization : authString}}
     ).then((response) => response.data)
     .then(data => {
       setTimeout(() => {
@@ -145,9 +154,13 @@ class DemandeChequier extends Component {
       },
     };
 
+    let authString = sessionStorage.getItem('basicauth');
+    
+
     Axios.put(
-      "http://localhost:8082/demandeChequier/demandeChequier/" + this.state.demandeChequier.id,
-      demandeChequier
+      "http://localhost:8082/demandeChequier/" + this.state.demandeChequier.id,
+      demandeChequier,
+      {headers : {authorization : authString}}
     ).then(response => response.data)
     .then(data => {
       setTimeout(() => {
@@ -175,35 +188,46 @@ class DemandeChequier extends Component {
 
   signerDemandeChequier = (event) => {
     event.preventDefault();
-    
-    Axios.put(
-      "http://localhost:8082/demandeChequier/demandeChequier/signer/" + this.state.demandeChequier.id,
-      this.state.password
-    ).then(response => response.data)
-    .then(data => {
-      setTimeout(() => {
-        if (data != null) {
-          this.setState({
-            show: true,
-            type: "primary",
-          });
-          setTimeout(() => {
-            this.setState({ show: false });
-            return this.props.history.push("/list");
-          }, 3000);
-          console.log("niice");
-        } else {
-          this.setState({
-            show: false,
-            type: "",
-          });
-          console.log("walo");
-         // setTimeout(() => alert("Votre mot de passe est incorrecte!"), 3000);
-        }
-      }, 200);
-    });
 
-    this.setState({ demandeChequier: this.initialState });
+    const pswd = this.state.password;
+    
+    let authString = sessionStorage.getItem('basicauth');
+    const verification = 'Basic ' + window.btoa(sessionStorage.getItem('username') + ':' + pswd)
+    if(authString === verification)
+    {
+      Axios.get(
+        "http://localhost:8082/demandeChequier/signer/" + this.state.demandeChequier.id,
+      {headers : {authorization : authString}}
+      ).then(response => response.data)
+      .then(data => {
+        setTimeout(() => {
+          if (data != null) {
+            this.setState({
+              show: true,
+              type: "primary",
+            });
+            setTimeout(() => {
+              this.setState({ show: false });
+              return this.props.history.push("/list");
+            }, 3000);
+          } else {
+            this.setState({
+              show: false,
+              type: "",
+            });
+          }
+        }, 200);
+      });
+  
+      this.setState({ demandeChequier: this.initialState });
+    }
+    else {
+      alert("Mot de passe incorrect !");
+      this.setState({...this.state,
+      password: ""})
+    }
+
+    
   };
 
   demandeChequierChange = (event) => {
@@ -245,7 +269,12 @@ class DemandeChequier extends Component {
 
 
     return (
+      
       <div>
+        <NavigationBar/>
+      <Container>
+        <Row>
+          <Col lg="12" style={{marginTop: '25px'}}>
         <div style={{ dispaly: show ? "block" : "none" }}>
           <ToastComponent show={show} type={type} />
         </div>
@@ -375,6 +404,9 @@ class DemandeChequier extends Component {
             </Card.Footer>
           </Form>
         </Card>
+        </Col>
+        </Row>
+        </Container>
       </div>
     );
   }
