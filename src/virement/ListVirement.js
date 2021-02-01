@@ -11,26 +11,18 @@ import {
   Table,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import "./demandeChequier.css";
+import "./Virement.css";
 import Axios from "axios";
 import NavigationBar from "../shared/NavigationBar";
+import Virement from "./Virement";
 
-class ListDemandeChequier extends Component {
+class ListVirement extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      demandeChequiers: [],
+      virements: [],
       currentPage: 1,
       numberPerPage: 5,
-      search: {
-        numeroCompte: "",
-        dateDebut: "",
-        dateFin: "",
-        statut: "",
-        montantMax: "",
-        montantMin: "",
-      },
-      comptes: [],
     };
   }
 
@@ -41,18 +33,16 @@ class ListDemandeChequier extends Component {
   }
   componentDidMount() {
     
-    this.getAllDemandeChequiers();
+    this.getAllVirements();
     
-    this.getAllComptes();
   }
 
   changePage = (event) => {
-    let demandeChequiersLength = this.state.demandeChequiers
-      .length;
+    let virementsLength = this.state.virements.length;
     if (
       (event.target.value > 0) &
       (event.target.value <
-        Math.ceil(demandeChequiersLength / this.state.numberPerPage) + 1)
+        Math.ceil(virementsLength / this.state.numberPerPage) + 1)
     ) {
       this.setState({
         currentPage: parseInt(event.target.value),
@@ -75,11 +65,11 @@ class ListDemandeChequier extends Component {
   };
 
   nextPage = () => {
-    let demandeChequiersLength = this.state.demandeChequiers
+    let virementsLength = this.state.virements
       .length;
     if (
       this.state.currentPage <
-      Math.ceil(demandeChequiersLength / this.state.numberPerPage)
+      Math.ceil(virementsLength / this.state.numberPerPage)
     )
       this.setState({
         currentPage: this.state.currentPage + 1,
@@ -87,83 +77,44 @@ class ListDemandeChequier extends Component {
   };
 
   lastPage = () => {
-    let demandeChequiersLength = this.state.demandeChequiers
+    let virementsLength = this.state.virements
       .length;
     if (
       this.state.currentPage <
-      Math.ceil(demandeChequiersLength / this.state.numberPerPage)
+      Math.ceil(virementsLength / this.state.numberPerPage)
     )
       this.setState({
         currentPage: Math.ceil(
-          demandeChequiersLength / this.state.numberPerPage
+          virementsLength / this.state.numberPerPage
         ),
       });
   };
 
-  getAllDemandeChequiers = () => {
+
+  getAllVirements = () => {
     let authString = sessionStorage.getItem('basicauth');
-    Axios.get("http://localhost:8083/abonne/"+sessionStorage.getItem('id')+"/demandeChequiers",
+    
+    Axios.get("http://localhost:8082/abonne/"+sessionStorage.getItem('id')+"/virements",
     {headers : {authorization : authString}})
     .then((response) => response.data)
     .then((data) => {
+      
       this.setState({
-        demandeChequiers : data,
-        })
-      });
-  };
-
-  getAllComptes = () => {
-    let authString = sessionStorage.getItem('basicauth');
-    Axios.get("http://localhost:8083/abonne/"+sessionStorage.getItem('id')+"/comptes",
-    {headers : {authorization : authString}})
-      .then((response) => response.data)
-      .then((data) => {
-        this.setState({
-          comptes: data.map((compte) => {
-            return {
-              value: compte.numeroCompte,
-              display: compte.numeroCompte,
-            };
-          }),
+        virements : data,
         });
       });
   };
 
-  // searchChange = (event) => {
-  //   this.getAllDemandeChequiers();
-  //   this.setState({
-  //     search: {
-  //       [event.target.name]: event.target.value,
-  //     },
-  //   });
 
-  //   const search = {
-  //     numeroCompte: this.state.search.numeroCompte,
-  //     dateDebut: this.state.search.dateDebut,
-  //     dateFin: this.state.search.dateFin,
-  //     statut: this.state.search.statut,
-  //     montantMax: this.state.search.montantMax,
-  //     montantMin: this.state.search.montantMin,
-  //   };
 
-  //   var result = [];
-  //   if (search.numeroCompte != "") {
-  //     console.log(search.numeroCompte);
-  //     // this.state.demandeChequiers.map((demande) => {
-  //     //   const found = demande.compte.numeroCompte;
-  //     // if (found.includes(search.numeroCompte)) result.concat(demande);
-  //     // console.log(result);
-  //     //});
-  //   }
-  // };
 
   render() {
     
-    const { currentPage, numberPerPage, search, comptes, demandeChequiers } = this.state;
+    const { currentPage, numberPerPage, virements } = this.state;
     const lastIndex = currentPage * numberPerPage;
     const firstIndex = lastIndex - numberPerPage;
-    const currentList = demandeChequiers.slice(firstIndex, lastIndex);
-    const totalPages = Math.ceil(demandeChequiers.length / numberPerPage);
+    const currentList = virements.slice(firstIndex, lastIndex);
+    const totalPages = Math.ceil(virements.length / numberPerPage);
 
     return (
       <div>
@@ -171,63 +122,63 @@ class ListDemandeChequier extends Component {
       <Container>
         <Row>
           <Col lg="12" style={{marginTop: '25px'}}>
-
           <br></br>
         <ButtonGroup style={{ display: "flex", justifyContent: "center" }}>
                         <Link
                           to={{
-                            pathname: "addDemandeChequier",
+                            pathname: "addVirement",
                             state: { fromDashboard: true },
                           }}
-                          className="btn btn-info"
+                          className="btn btn-warning"
                           
                           
                         >
                           <img
-                            src={this.path+"/images/add-white.png"}
+                            src={this.path+"/images/add-black.png"}
                             width="20"
                             style={{ marginRight: "10px" }}
                             alt="Add"
                           />
-                           Nouvelle demande chéquier
+                           Effectuer un virement
                         </Link>
           </ButtonGroup>
         <br></br>
         <br></br>
-
           <Card className="border border-dark bg-dark text-white">
-        <Card.Header>Liste des demandes chéquiers</Card.Header>
+        <Card.Header>Liste des virements</Card.Header>
         <Card.Body>
           
           <Table striped bordered hover responsive variant="dark">
             <thead>
               <tr>
                 <th>Numéro compte</th>
+                <th>Bénéficiaire</th>
                 <th>Motif</th>
                 <th>Date d'exécution</th>
-                <th>Montant chèque</th>
+                <th>Montant</th>
                 <th>Statut</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {demandeChequiers.length === 0 ? (
+              {virements.length === 0 ? (
                 <tr align="center">
-                  <td colSpan="6">Aucune demande chéquier effectuée.</td>
+                  <td colSpan="7">Aucune virement effectué.</td>
                 </tr>
               ) : (
-                currentList.map((demandeChequier) => (
-                  <tr key={demandeChequier.id}>
-                    <td>{demandeChequier.compte.numeroCompte}</td>
-                    <td>{demandeChequier.motif}</td>
-                    <td>{demandeChequier.dateExecution}</td>
-                    <td>{demandeChequier.montantChequier}</td>
-                    <td>{demandeChequier.statut}</td>
+                currentList.map((virement) => (
+                  <tr key={virement.id}>
+                    <td>{virement.compte.numeroCompte}</td>
+                    <td>{virement.beneficiaire.numeroCompte}</td>
+                    <td>{virement.motif}</td>
+                    <td>{virement.dateExecution}</td>
+                    <td>{virement.montant}</td>
+                    <td>{virement.statut}</td>
                     <td align="center">
                       <ButtonGroup>
                         <Link
                           to={{
-                            pathname: "seeDemandeChequier/" + demandeChequier.id,
+                            pathname: "seeVirement/" + virement.id,
                             state: { fromDashboard: true },
                           }}
                           className="btn btn-primary"
@@ -240,10 +191,10 @@ class ListDemandeChequier extends Component {
                           />
                         </Link>
 
-                        {demandeChequier.statut === "Enregistrée" ? (
+                        {virement.statut === "Enregistré" ? (
                           <Link
                             to={{
-                              pathname: "editDemandeChequier/" + demandeChequier.id,
+                              pathname: "editVirement/" + virement.id,
                               state: { fromDashboard: true },
                             }}
                             className="btn btn-danger"
@@ -354,4 +305,4 @@ class ListDemandeChequier extends Component {
   }
 }
 
-export default ListDemandeChequier;
+export default ListVirement;

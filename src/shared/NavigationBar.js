@@ -10,17 +10,18 @@ export default function NavigationBar() {
   let loggedContent = isLoggedIn === true ? 
   <Navbar.Collapse id="responsive-navbar-nav">
   <Nav className="mr-auto">
-    <Link
-      to={{ pathname: "/add", state: { fromDashboard: true } }}
+  <Link
+      to={{ pathname: "/listDemandeChequier", state: { fromDashboard: true } }}
       className="nav-link"
+      style={{marginRight: "25px"}}
     >
-      Nouvelle demande
+      Liste demandes chéquiers
     </Link>
     <Link
-      to={{ pathname: "/list", state: { fromDashboard: true } }}
+      to={{ pathname: "/listVirement", state: { fromDashboard: true } }}
       className="nav-link"
     >
-      Liste demandes
+      Liste virements
     </Link>
   </Nav>
   <Nav>

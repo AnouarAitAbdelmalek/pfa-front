@@ -6,6 +6,9 @@ import DemandeChequier from "./demandeChequier/DemandeChequier";
 import ListDemandeChequier from "./demandeChequier/ListDemandeChequier";
 import Logout from "./logout/Logout";
 import Login from "./login/Login";
+import ListVirement from "./virement/ListVirement"
+import Virement from "./virement/Virement";
+
 
 function App() {
 
@@ -17,21 +20,33 @@ function App() {
       {isLogged = sessionStorage.getItem('username') != null ? true : false}
             <Switch>
               <Route path="/login" exact component={Login} >
-              {isLogged=== true ? <Redirect to="/list" /> : ""}
+              {isLogged=== true ? <Redirect to="/listDemandeChequier" /> : ""}
               </Route>
               <Route path="/" exact >
-              {isLogged=== false ? <Redirect to="/login" /> : <Redirect to="/list" />}
+              {isLogged=== false ? <Redirect to="/login" /> : <Redirect to="/listDemandeChequier" />}
               </Route>
-              <Route path="/list" exact component={ListDemandeChequier} >
+              <Route path="/listDemandeChequier" exact component={ListDemandeChequier} >
                 {isLogged=== false ? <Redirect to="/login" /> : ""}
               </Route>
-              <Route path="/add" exact component={DemandeChequier} >
+              <Route path="/addDemandeChequier" exact component={DemandeChequier} >
                 {isLogged=== false ? <Redirect to="/login" /> : ""}
               </Route>
-              <Route path="/edit/:idEdit" exact component={DemandeChequier} >
+              <Route path="/editDemandeChequier/:idEdit" exact component={DemandeChequier} >
               {isLogged=== false ? <Redirect to="/login" /> : ""}
               </Route>
-              <Route path="/see/:idSee" exact component={DemandeChequier} >
+              <Route path="/seeDemandeChequier/:idSee" exact component={DemandeChequier} >
+              {isLogged=== false ? <Redirect to="/login" /> : ""}
+              </Route>
+              <Route path="/listVirement" exact component={ListVirement} >
+                {isLogged=== false ? <Redirect to="/login" /> : ""}
+              </Route>
+              <Route path="/addVirement" exact component={Virement} >
+                {isLogged=== false ? <Redirect to="/login" /> : ""}
+              </Route>
+              <Route path="/editVirement/:idEdit" exact component={Virement} >
+              {isLogged=== false ? <Redirect to="/login" /> : ""}
+              </Route>
+              <Route path="/seeVirement/:idSee" exact component={Virement} >
               {isLogged=== false ? <Redirect to="/login" /> : ""}
               </Route>
               <Route path="/logout" exact component={Logout} >

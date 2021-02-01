@@ -36,10 +36,10 @@ export default class ToastComponent extends Component {
           </Toast.Header>
           <Toast.Body>
             {this.props.type === "success"
-              ? "Demande enregistrée avec succès."
+              ? "Opération enregistrée avec succès."
               : this.props.type === "danger"
-              ? "Demande modifiée avec succès."
-              : "Demande signée avec succès."}
+              ? "Opération modifiée avec succès."
+              : "Opération signée avec succès."}
           </Toast.Body>
         </Toast>
       </div>
